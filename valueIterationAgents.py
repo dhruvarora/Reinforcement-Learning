@@ -45,6 +45,31 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
+        states = self.mdp.getStates();
+        curU = util.Counter();
+
+        # curU = U, self.values = U'
+        for i in range(self.iterations):
+            curU = self.values.copy();
+            for state in states:
+                actions = mdp.getPossibleActions(state)
+                actCount = util.Counter()
+                for action in actions:
+                    stateProbs = self.mdp.getTransitionStatesAndProbs(state,action)
+                    actCount[action] = sum([prob*(mdp.getReward(state,action,nstate) + discount*curU[nstate]) for nstate,prob in stateProbs])
+                    #print str(state) + ": " + str(action) + " " + str(sum([prob*(mdp.getReward(state,action,nstate) + discount*curU[nstate]) for nstate,prob in stateProbs])) 
+                    
+                    
+                self.values[state] = actCount[actCount.argMax()]
+               
+
+                
+
+                
+                
+
+
+
 
 
     def getValue(self, state):
@@ -60,7 +85,8 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        stateProbs = self.mdp.getTransitionStatesAndProbs(state,action)
+        return sum([prob*(self.mdp.getReward(state,action,nstate) + self.discount*self.values[nstate]) for nstate,prob in stateProbs])
 
     def computeActionFromValues(self, state):
         """
@@ -72,6 +98,16 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
+        actCount = util.Counter()
+        actions = self.mdp.getPossibleActions(state)
+        for action in actions:
+            actCount[action] = self.computeQValueFromValues(state,action) 
+        return actCount.argMax() 
+
+
+
+
+
         util.raiseNotDefined()
 
     def getPolicy(self, state):
